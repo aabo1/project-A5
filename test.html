@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Project A5</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        background-color: #2e3440;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+      .keyboard {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-right: 10%;
+      }
+      .row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .key {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 5px;
+        width: 70px;
+        height: 70px;
+        border: 3px solid  #d08770;
+        color: #eceff4;
+        font-size: 30px;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        margin-right: 8px;
+        transition: background-color 0.2s ease;
+        box-shadow: 0px 0px 10px black;
+      }
+      .key:hover {
+        background-color: #3c73a0;
+      }
+      .pressed {
+        animation: pressed-animation 0.03s linear forwards;
+      }
+
+      @keyframes pressed-animation {
+        0% {
+          background-color: rgba(128, 128, 128, 0.473);
+          transform: scale(1);
+        }
+        100% {
+          background-color: gray;
+          transform: scale(0.9);
+        }
+      }
+      .row:first-of-type .key:not(:last-of-type)::after {
+        content: "";
+        display: inline-block;
+        width: 5px;
+      }
+      .box {
+        color: #d8dee9;
+        width: 260px;
+        border: 3px solid #d08770;
+        border-radius: 20px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: left;
+        box-shadow: 0px 0px 10px black;
+      }
+      .toggle-buttons {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-top: 20px;
+      }
+      .toggle-buttons button {
+        width: 80px;
+        height: 40px;
+        font-size: 18px;
+        margin: 5px;
+        border-radius: 10px;
+        background-color: #d08770;
+        border: 1px #3c73a0;
+        color: #d8dee9;
+        outline: none;
+        box-shadow: 0px 0px 10px black;
+      }
+      .toggle-buttons button:hover {
+        filter: brightness(85%);
+        
+      }
+      .toggle-buttons button:active {
+        transform: scale(0.9);
+        animation: pressed-animation 0.02s linear forwards;
+      }
+      button.active {
+        background-color: #a3be8c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="keyboard">
+      <div class="row">
+        <div class="key w">W</div>
+      </div>
+      <div class="row">
+        <div class="key a">A</div>
+        <div class="key s">S</div>
+        <div class="key d">D</div>
+      </div>
+    </div>
+    <div class="box">
+      <ul class="data">
+        <span class="data-label">Retning: </span><p1 id="direction"> stopped </p1>
+        <p><span class="data-label">Hastighet:</span> 0 </p>
+        <p><span class="data-label">Kjørt:</span> 0 </p>
+        <p><span class="data-label">Batteri (cm):</span> 2000 </p>
+        <p><span class="data-label">Batteri (%):</span> 100 </p>
+      </ul>
+      <div class="toggle-buttons">
+        <button id="manual-button">Manual</button>
+        <button id="park-button">Park</button>
+        <button id="charge-button">Charge</button>
+      </div>
+    </div>
+    <script>
+      const manualButton = document.getElementById("manual-button");
+      const parkButton = document.getElementById("park-button");
+      const chargeButton = document.getElementById("charge-button");
+      const keyboard = document.querySelector('.keyboard');
+      const keys = document.querySelectorAll('.key');
+
+
+      // Controls the active mode button. When one is pressed, the others vil deactivate.
+      manualButton.addEventListener("click", function() {
+        manualButton.classList.toggle("active");
+        parkButton.classList.remove("active");
+        chargeButton.classList.remove("active");
+      });
+
+      parkButton.addEventListener("click", function() {
+        parkButton.classList.toggle("active");
+        manualButton.classList.remove("active");
+        chargeButton.classList.remove("active");
+      });
+
+      chargeButton.addEventListener("click", function() {
+        chargeButton.classList.toggle("active");
+        manualButton.classList.remove("active");
+        parkButton.classList.remove("active");
+      });
+
+      // Updates direction and keyboard based on keyboard input
+      let key_direction = null;
+
+      document.addEventListener('keydown', function(event) {
+        const keycode = document.querySelector(`.key.${event.key.toLowerCase()}`);
+        if (keycode) {
+          keycode.classList.add('pressed');
+        }
+        const key = event.key.toLowerCase();
+        if (key === 'w') {
+          key_direction = 'forward';
+        } else if (key === 's') {
+          key_direction = 'backward';
+        } else if (key === 'a') {
+          key_direction = 'left';
+        } else if (key === 'd') {
+          key_direction = 'right';
+        }
+      });
+
+      document.addEventListener('keyup', function(event) {
+        const keycode = document.querySelector(`.key.${event.key.toLowerCase()}`);
+        keycode.classList.remove('pressed');
+        const key = event.key.toLowerCase();
+        if (key === 'w' && key_direction === 'forward') {
+          key_direction = 'stopped';
+        } else if (key === 's' && key_direction === 'backward') {
+          key_direction = 'stopped';
+        } else if (key === 'a' && key_direction === 'left') {
+          key_direction = 'stopped';
+        } else if (key === 'd' && key_direction === 'right') {
+          key_direction = 'stopped';
+        }
+      });      
+
+      document.getElementById("direction").innerHTML = key_direction;
+    </script>
+  </body>
+</html>
